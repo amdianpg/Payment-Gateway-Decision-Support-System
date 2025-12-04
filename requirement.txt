@@ -1,3 +1,5 @@
-pandas
-xlsxwriter
 streamlit
+pandas
+numpy
+altair
+scipy
