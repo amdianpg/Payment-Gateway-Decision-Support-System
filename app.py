@@ -47,9 +47,6 @@ with st.sidebar:
 
 **5️⃣ Visualisasi**  
   Grafik SAW & TOPSIS tersedia otomatis.
-
-**6️⃣ Export**  
-  Semua hasil bisa di-download dalam format Excel.
   """)
     
 # --------------------------
