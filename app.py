@@ -243,25 +243,30 @@ st.altair_chart(bar, use_container_width=True)
 # Analisis Kecocokan
 # --------------------------
 st.markdown("---")
-st.header("Analisis Kecocokan SAW vs TOPSIS")
+st.header("Analisis Kecocokan SAW vs TOPSIS (tanpa scipy)")
 
-from scipy.stats import spearmanr
+# Ranking
+saw_rank = df_saw_rank["Rank"]
+topsis_rank = df_topsis_rank["Rank"]
 
-# 1) Spearman Rank Correlation
-corr, pval = spearmanr(df_saw_rank["Rank"], df_topsis_rank["Rank"])
-st.write(f"Spearman Rank Correlation: {corr:.4f} (p-value: {pval:.4f})")
+# Selisih ranking kuadrat
+d_squared = (saw_rank - topsis_rank)**2
+n = len(saw_rank)
 
-# 2) Selisih ranking per alternatif
-rank_diff = df_saw_rank["Rank"] - df_topsis_rank["Rank"]
+# Spearman Rank Correlation manual
+spearman_corr = 1 - (6 * d_squared.sum()) / (n * (n**2 - 1))
+st.write(f"Spearman Rank Correlation (manual): {spearman_corr:.4f}")
+
+# Selisih ranking per alternatif
 df_diff = pd.DataFrame({
-    "SAW Rank": df_saw_rank["Rank"],
-    "TOPSIS Rank": df_topsis_rank["Rank"],
-    "Selisih Rank": rank_diff.abs()
+    "SAW Rank": saw_rank,
+    "TOPSIS Rank": topsis_rank,
+    "Selisih Rank": (saw_rank - topsis_rank).abs()
 })
 st.subheader("Selisih Ranking per Alternatif")
 st.dataframe(df_diff.style.format({"Selisih Rank":"{:.0f}"}), use_container_width=True)
 
-# 3) Visualisasi perbandingan ranking
+# Visualisasi perbandingan ranking
 df_diff_vis = df_diff.reset_index().melt(id_vars="index", value_vars=["SAW Rank","TOPSIS Rank"], 
                                         var_name="Method", value_name="Rank")
 bar_corr = alt.Chart(df_diff_vis).mark_bar().encode(
