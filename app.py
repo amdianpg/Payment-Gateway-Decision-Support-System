@@ -252,12 +252,8 @@ df_diff["Status"] = df_diff["Selisih Rank"].apply(lambda x: "🔥 Tidak konsiste
 
 st.subheader("Kecocokan per Alternatif")
 st.dataframe(df_diff.style.applymap(
-    lambda val: "background-color: #ffcccc" if val=="🔥 Tidak konsisten" else 
-                "background-color: #ccffcc" if val=="✅ Konsisten" else "",
+    lambda val: "background-color: 9CC6DB" if val=="🔥 Tidak konsisten" else 
+                "background-color: 9CC6DB" if val=="✅ Konsisten" else "",
     subset=["Status"]
 ), use_container_width=True)
 
-# Ringkasan konsistensi
-consistency_counts = df_diff["Status"].value_counts()
-st.subheader("Ringkasan Konsistensi")
-st.bar_chart(consistency_counts)
