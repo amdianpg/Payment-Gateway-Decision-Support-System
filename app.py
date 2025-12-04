@@ -227,22 +227,37 @@ st.altair_chart(bar, use_container_width=True)
 # Perbandingan
 # --------------------------
 st.markdown("---")
-st.header("Analisis Kecocokan")
+st.header("Analisis Kecocokan Kreatif")
 
-# Cari top alternatif masing-masing metode
+# Top alternatif
 top_saw = df_saw_rank.index[0]
 top_topsis = df_topsis_rank.index[0]
 
-st.write(f"Top SAW: {top_saw} — Top TOPSIS: {top_topsis}")
-
-# Notifikasi jika setuju
+# Notifikasi top alternatif
 if top_saw == top_topsis:
-    st.success(f"Kedua metode setuju pada alternatif {top_saw}.")
+    st.success(f"🏆 Kedua metode sepakat pada alternatif **{top_saw}** sebagai yang terbaik!")
 else:
-    st.warning(f"Top alternatif berbeda: SAW = {top_saw}, TOPSIS = {top_topsis}.")
+    st.warning(f"⚠️ Top berbeda: SAW = **{top_saw}**, TOPSIS = **{top_topsis}**.")
 
-# Cek apakah semua alternatif memiliki ranking yang sama
-if (df_saw_rank["Rank"].values == df_topsis_rank["Rank"].values).all():
-    st.info("Semua alternatif memiliki ranking yang sama pada kedua metode.")
-else:
-    st.info("Beberapa alternatif memiliki perbedaan ranking antara kedua metode.")
+# Selisih ranking tiap alternatif
+df_diff = pd.DataFrame({
+    "SAW Rank": df_saw_rank["Rank"],
+    "TOPSIS Rank": df_topsis_rank["Rank"],
+    "Selisih Rank": (df_saw_rank["Rank"] - df_topsis_rank["Rank"]).abs()
+})
+
+# Tandai alternatif paling tidak konsisten
+max_diff = df_diff["Selisih Rank"].max()
+df_diff["Status"] = df_diff["Selisih Rank"].apply(lambda x: "🔥 Tidak konsisten" if x==max_diff and x>0 else "✅ Konsisten" if x==0 else "⚡ Sedang")
+
+st.subheader("Kecocokan per Alternatif")
+st.dataframe(df_diff.style.applymap(
+    lambda val: "background-color: #ffcccc" if val=="🔥 Tidak konsisten" else 
+                "background-color: #ccffcc" if val=="✅ Konsisten" else "",
+    subset=["Status"]
+), use_container_width=True)
+
+# Ringkasan konsistensi
+consistency_counts = df_diff["Status"].value_counts()
+st.subheader("Ringkasan Konsistensi")
+st.bar_chart(consistency_counts)
