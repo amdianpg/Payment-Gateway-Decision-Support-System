@@ -221,7 +221,8 @@ with st.expander("Contoh perhitungan manual TOPSIS untuk satu alternatif"):
 st.markdown("---")
 st.header("Perbandingan (Visual)")
 comp = pd.concat([df_saw_rank["SAW Score"], df_topsis_rank["TOPSIS Score"]], axis=1).fillna(0)
-comp = comp.reset_index().melt(id_vars="index", var_name="Method", value_name="Score").rename(columns={"index":"Alternative"})
+comp = comp.reset_index(names="Alternative")
+comp = comp.melt(id_vars="Alternative", var_name="Method", value_name="Score")
 bar = alt.Chart(comp).mark_bar().encode(x='Alternative:N', y='Score:Q', color='Method:N', tooltip=['Alternative','Method','Score']).properties(height=350)
 st.altair_chart(bar, use_container_width=True)
 
