@@ -94,7 +94,7 @@ else:
             st.success("Dataset berhasil diunggah.")
         except Exception as e:
             st.error("Gagal membaca file: " + str(e))
-            df_values = initial
+            df_values = df_default
     else:
         st.info("Belum ada file diupload. Gunakan mode manual atau upload file.")
         df_values = pd.DataFrame({
