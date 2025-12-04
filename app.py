@@ -223,3 +223,52 @@ comp = comp.melt(id_vars="Alternative", var_name="Method", value_name="Score")
 bar = alt.Chart(comp).mark_bar().encode(x='Alternative:N', y='Score:Q', color='Method:N', tooltip=['Alternative','Method','Score']).properties(height=350)
 st.altair_chart(bar, use_container_width=True)
 
+# --------------------------
+# Perbandingan
+# --------------------------
+st.markdown("---")
+st.header("Perbandingan SAW & TOPSIS")
+comp = pd.concat([df_saw_rank["SAW Score"], df_topsis_rank["TOPSIS Score"]], axis=1).fillna(0)
+comp = comp.reset_index(names="Alternative")
+comp = comp.melt(id_vars="Alternative", var_name="Method", value_name="Score")
+bar = alt.Chart(comp).mark_bar().encode(
+    x='Alternative:N', 
+    y='Score:Q', 
+    color='Method:N', 
+    tooltip=['Alternative','Method','Score']
+).properties(height=350)
+st.altair_chart(bar, use_container_width=True)
+
+# --------------------------
+# Analisis Kecocokan
+# --------------------------
+st.markdown("---")
+st.header("Analisis Kecocokan SAW vs TOPSIS")
+
+from scipy.stats import spearmanr
+
+# 1) Spearman Rank Correlation
+corr, pval = spearmanr(df_saw_rank["Rank"], df_topsis_rank["Rank"])
+st.write(f"Spearman Rank Correlation: {corr:.4f} (p-value: {pval:.4f})")
+
+# 2) Selisih ranking per alternatif
+rank_diff = df_saw_rank["Rank"] - df_topsis_rank["Rank"]
+df_diff = pd.DataFrame({
+    "SAW Rank": df_saw_rank["Rank"],
+    "TOPSIS Rank": df_topsis_rank["Rank"],
+    "Selisih Rank": rank_diff.abs()
+})
+st.subheader("Selisih Ranking per Alternatif")
+st.dataframe(df_diff.style.format({"Selisih Rank":"{:.0f}"}), use_container_width=True)
+
+# 3) Visualisasi perbandingan ranking
+df_diff_vis = df_diff.reset_index().melt(id_vars="index", value_vars=["SAW Rank","TOPSIS Rank"], 
+                                        var_name="Method", value_name="Rank")
+bar_corr = alt.Chart(df_diff_vis).mark_bar().encode(
+    x='index:N',
+    y='Rank:Q',
+    color='Method:N',
+    tooltip=['index','Method','Rank']
+).properties(height=350)
+st.subheader("Visualisasi Perbandingan Ranking")
+st.altair_chart(bar_corr, use_container_width=True)
