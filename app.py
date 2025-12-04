@@ -251,10 +251,15 @@ max_diff = df_diff["Selisih Rank"].max()
 df_diff["Status"] = df_diff["Selisih Rank"].apply(lambda x: "🔥 Tidak konsisten" if x==max_diff and x>0 else "✅ Konsisten" if x==0 else "⚡ Sedang")
 
 st.subheader("Kecocokan per Alternatif")
-st.dataframe(df_diff.style.applymap(
-    lambda val: "" if val=="🔥 Tidak konsisten" else 
-                "" if val=="✅ Konsisten" else "",
-))
-    subset=["Status"]
-), use_container_width=True)
+st.dataframe(
+    # Semua styling dan pemrosesan data dilakukan di sini
+    df_diff.style.applymap(
+        lambda val: "" if val=="🔥 Tidak konsisten" else 
+                    "" if val=="✅ Konsisten" else "",
+        # Jika Anda ingin menerapkan lambda hanya pada kolom tertentu, gunakan 'subset' di dalam .applymap()
+        # subset=["Status"] 
+    ), 
+    # Argumen untuk st.dataframe()
+    use_container_width=True
+)
 
