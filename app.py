@@ -227,53 +227,22 @@ st.altair_chart(bar, use_container_width=True)
 # Perbandingan
 # --------------------------
 st.markdown("---")
-st.header("Perbandingan SAW & TOPSIS")
-comp = pd.concat([df_saw_rank["SAW Score"], df_topsis_rank["TOPSIS Score"]], axis=1).fillna(0)
-comp = comp.reset_index(names="Alternative")
-comp = comp.melt(id_vars="Alternative", var_name="Method", value_name="Score")
-bar = alt.Chart(comp).mark_bar().encode(
-    x='Alternative:N', 
-    y='Score:Q', 
-    color='Method:N', 
-    tooltip=['Alternative','Method','Score']
-).properties(height=350)
-st.altair_chart(bar, use_container_width=True)
+st.header("Analisis Kecocokan")
 
-# --------------------------
-# Analisis Kecocokan
-# --------------------------
-st.markdown("---")
-st.header("Analisis Kecocokan SAW vs TOPSIS (tanpa scipy)")
+# Cari top alternatif masing-masing metode
+top_saw = df_saw_rank.index[0]
+top_topsis = df_topsis_rank.index[0]
 
-# Ranking
-saw_rank = df_saw_rank["Rank"]
-topsis_rank = df_topsis_rank["Rank"]
+st.write(f"Top SAW: {top_saw} — Top TOPSIS: {top_topsis}")
 
-# Selisih ranking kuadrat
-d_squared = (saw_rank - topsis_rank)**2
-n = len(saw_rank)
+# Notifikasi jika setuju
+if top_saw == top_topsis:
+    st.success(f"Kedua metode setuju pada alternatif {top_saw}.")
+else:
+    st.warning(f"Top alternatif berbeda: SAW = {top_saw}, TOPSIS = {top_topsis}.")
 
-# Spearman Rank Correlation manual
-spearman_corr = 1 - (6 * d_squared.sum()) / (n * (n**2 - 1))
-st.write(f"Spearman Rank Correlation (manual): {spearman_corr:.4f}")
-
-# Selisih ranking per alternatif
-df_diff = pd.DataFrame({
-    "SAW Rank": saw_rank,
-    "TOPSIS Rank": topsis_rank,
-    "Selisih Rank": (saw_rank - topsis_rank).abs()
-})
-st.subheader("Selisih Ranking per Alternatif")
-st.dataframe(df_diff.style.format({"Selisih Rank":"{:.0f}"}), use_container_width=True)
-
-# Visualisasi perbandingan ranking
-df_diff_vis = df_diff.reset_index().melt(id_vars="index", value_vars=["SAW Rank","TOPSIS Rank"], 
-                                        var_name="Method", value_name="Rank")
-bar_corr = alt.Chart(df_diff_vis).mark_bar().encode(
-    x='index:N',
-    y='Rank:Q',
-    color='Method:N',
-    tooltip=['index','Method','Rank']
-).properties(height=350)
-st.subheader("Visualisasi Perbandingan Ranking")
-st.altair_chart(bar_corr, use_container_width=True)
+# Cek apakah semua alternatif memiliki ranking yang sama
+if (df_saw_rank["Rank"].values == df_topsis_rank["Rank"].values).all():
+    st.info("Semua alternatif memiliki ranking yang sama pada kedua metode.")
+else:
+    st.info("Beberapa alternatif memiliki perbedaan ranking antara kedua metode.")
