@@ -98,9 +98,10 @@ else:
     else:
         st.info("Belum ada file diupload. Gunakan mode manual atau upload file.")
         df_values = pd.DataFrame({
-            criteria_names[i]: [0 if not fuzzy_mode else "1;2;3" for _ in default_alternatives]
+            criteria_names[i]: [0 for _ in default_alternatives]
             for i in range(len(criteria_names))
         }, index=default_alternatives)
+
 
 # convert crisp or parse fuzzy
 def parse_cell(val):
