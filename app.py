@@ -253,7 +253,8 @@ df_diff["Status"] = df_diff["Selisih Rank"].apply(lambda x: "🔥 Tidak konsiste
 st.subheader("Kecocokan per Alternatif")
 st.dataframe(df_diff.style.applymap(
     lambda val: "" if val=="🔥 Tidak konsisten" else 
-                "" if val=="✅ Konsisten" else ""
+                "" if val=="✅ Konsisten" else "",
+))
     subset=["Status"]
 ), use_container_width=True)
 
