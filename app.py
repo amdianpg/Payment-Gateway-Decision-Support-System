@@ -240,7 +240,7 @@ result_tables["TOPSIS_Ranking"] = df_topsis_rank
 # allow download
 def to_excel_bytes(dfs: dict):
     output = BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         for k,v in dfs.items():
             try:
                 v.to_excel(writer, sheet_name=k)
